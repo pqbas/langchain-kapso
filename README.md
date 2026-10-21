@@ -10,12 +10,13 @@
 
 ## Features
 
-- **WhatsApp bridge for LangGraph**: every customer message runs your graph and the reply goes back on WhatsApp. You never call `graph.invoke` yourself.
-- **Memory per chat**: each Kapso conversation is a LangGraph thread, so a checkpointer gives every customer their own history.
-- **Production details handled**: signed webhooks are verified, retried deliveries are skipped, Kapso gets a `200` right away while the agent runs in the background, and messages of the same chat are processed in order.
-- **Human handoff**: the agent assigns the chat to a person in the Kapso inbox with a summary, stays quiet while they handle it, and takes over again when they unassign it.
-- **Least privilege tools**: a small set of WhatsApp tools (send, read, hand off) that is safe to give an agent reading untrusted customer messages.
-- **Sync and async client** for the Kapso WhatsApp and Platform APIs.
+- Every customer message on WhatsApp runs your LangGraph graph, and the reply goes back to the customer.
+- Each Kapso conversation is a LangGraph thread, so every customer keeps their own memory.
+- Signed webhooks are verified, retried deliveries are skipped and messages of the same chat are processed in order.
+- Kapso gets a `200` right away while the agent runs in the background.
+- The agent can hand a chat to a person in the Kapso inbox, stays quiet while they handle it and takes over again when they unassign it.
+- A small set of WhatsApp tools that is safe to give an agent reading untrusted customer messages.
+- Sync and async client for the Kapso WhatsApp and Platform APIs.
 
 ## Install
 
