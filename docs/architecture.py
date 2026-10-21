@@ -58,13 +58,13 @@ def arrow(x1, y1, x2, y2, label="", lx=None, ly=None, color=LINE):
 
 
 # Customer
-simple_icon("whatsapp", 62, 92, 120, "#25D366")
-text(122, 240, "Customer\non WhatsApp", 17)
+simple_icon("whatsapp", 67, 115, 110, "#25D366")
+text(122, 255, "Customer\non WhatsApp", 17)
 
 # Kapso
 box(270, 40, 330, 450, fill="#f6f8fa")
-kapso_icon(286, 52, 60)
-text(356, 94, "Kapso", 28, anchor="start", weight="bold")
+kapso_icon(361, 63, 44)
+text(415, 96, "Kapso", 28, anchor="start", weight="bold")
 box(300, 125, 270, 90)
 text(435, 165, "WhatsApp API", 16, weight="bold")
 text(435, 190, "delivers and sends messages", 13, MUTED)
@@ -74,7 +74,7 @@ text(435, 410, "your team answers here", 13, MUTED)
 
 # Your server
 box(680, 40, 700, 450, fill="#f6f8fa")
-text(700, 94, "Your server", 28, anchor="start", weight="bold")
+text(1030, 96, "Your server", 28, weight="bold")
 box(705, 125, 300, 160, fill="#fff8e1", stroke="#e3b341")
 text(855, 158, "langchain-kapso bridge", 16, weight="bold")
 text(728, 192, "verifies the webhook signature\nskips retried deliveries\nkeeps each chat in order\npauses during a handoff", 13.5, INK, anchor="start")
@@ -95,7 +95,7 @@ arrow(1005, 165, 1071, 165, "runs", ly=155)
 arrow(1075, 215, 1009, 215, "answer", ly=233)
 arrow(1215, 250, 1215, 341)
 arrow(1075, 390, 574, 390, "assigns the chat with a summary", ly=380)
-arrow(300, 385, 140, 285, "a person\nanswers", lx=175, ly=375)
+arrow(300, 385, 150, 300, "a person\nanswers", lx=185, ly=385)
 
 svg = (
     f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">\n'
