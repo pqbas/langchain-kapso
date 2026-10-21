@@ -2,6 +2,7 @@
 
 Connect LangChain and LangGraph agents to WhatsApp through [Kapso](https://kapso.ai).
 
+> [!WARNING]
 > Community integration, not affiliated with Kapso or LangChain.
 
 - **Bridge**: receive Kapso webhooks, run your LangGraph graph and reply on WhatsApp.
