@@ -10,26 +10,12 @@
 
 ## Features
 
-- **WhatsApp → LangGraph bridge**: every customer message runs your graph and the reply goes back on WhatsApp. You never call `graph.invoke` yourself.
+- **WhatsApp bridge for LangGraph**: every customer message runs your graph and the reply goes back on WhatsApp. You never call `graph.invoke` yourself.
 - **Memory per chat**: each Kapso conversation is a LangGraph thread, so a checkpointer gives every customer their own history.
 - **Production details handled**: signed webhooks are verified, retried deliveries are skipped, Kapso gets a `200` right away while the agent runs in the background, and messages of the same chat are processed in order.
 - **Human handoff**: the agent assigns the chat to a person in the Kapso inbox with a summary, stays quiet while they handle it, and takes over again when they unassign it.
 - **Least privilege tools**: a small set of WhatsApp tools (send, read, hand off) that is safe to give an agent reading untrusted customer messages.
 - **Sync and async client** for the Kapso WhatsApp and Platform APIs.
-
-## langchain-kapso vs Kapso MCP
-
-Kapso's [MCP server](https://docs.kapso.ai/docs/whatsapp/mcp) and this library solve different problems, and work well together.
-
-| | Kapso MCP | langchain-kapso |
-| --- | --- | --- |
-| Made for | Coding and operator agents (Claude Code, Cursor) that manage your Kapso project | The agent in production that answers your customers |
-| Reacts when a customer writes | No, the agent has to start every action | Yes, webhook → graph → reply |
-| Memory, ordering, retries, handoff pause | No | Yes |
-| Tools given to the model | 184 tools, about 34k tokens per call | 5 tools, about 700 tokens |
-| Destructive tools reachable with an API key | Yes (delete contacts, send broadcasts, edit webhooks…) | None |
-
-Use the MCP in your editor to set up and operate Kapso, and langchain-kapso to run the customer-facing agent.
 
 ## Install
 
@@ -41,8 +27,8 @@ uv add "langchain-kapso[server] @ git+https://github.com/pqbas/langchain-kapso"
 Set your credentials, from the Kapso dashboard:
 
 ```bash
-KAPSO_API_KEY=...            # Integrations → API keys
-KAPSO_PHONE_NUMBER_ID=...    # WhatsApp → Phone numbers
+KAPSO_API_KEY=...            # Integrations, API keys
+KAPSO_PHONE_NUMBER_ID=...    # WhatsApp, Phone numbers
 KAPSO_WEBHOOK_SECRET=...     # the secret of your webhook
 ```
 
