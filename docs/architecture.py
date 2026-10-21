@@ -58,8 +58,8 @@ def arrow(x1, y1, x2, y2, label="", lx=None, ly=None, color=LINE):
 
 
 # Customer
-simple_icon("whatsapp", 67, 115, 110, "#25D366")
-text(122, 255, "Customer\non WhatsApp", 17)
+simple_icon("whatsapp", 67, 200, 110, "#25D366")
+text(122, 340, "Customer\non WhatsApp", 17)
 
 # Kapso
 box(270, 40, 330, 450, fill="#f6f8fa")
@@ -85,15 +85,15 @@ text(1215, 385, "kapso_human_handoff", 15, weight="bold")
 text(1215, 410, "one of the agent's tools", 13, MUTED)
 
 # Flow
-arrow(190, 150, 296, 150, "message")
-arrow(300, 195, 194, 195, "reply", ly=213)
+arrow(188, 235, 296, 155, "message", lx=225, ly=180)
+arrow(300, 200, 192, 262, "reply", lx=262, ly=248)
 arrow(570, 150, 701, 150, "webhook")
 arrow(705, 195, 574, 195, "reply", ly=213)
 arrow(1005, 165, 1071, 165, "runs", ly=155)
 arrow(1075, 215, 1009, 215, "answer", ly=233)
 arrow(1215, 250, 1215, 341)
 arrow(1075, 390, 574, 390, "assigns the chat with a summary", ly=380)
-arrow(300, 385, 150, 300, "a person\nanswers", lx=185, ly=385)
+arrow(300, 390, 190, 300, "a person\nanswers", lx=205, ly=400)
 
 svg = (
     f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">\n'
