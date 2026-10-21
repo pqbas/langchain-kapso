@@ -45,11 +45,14 @@ class KapsoBridge:
     bridge = KapsoBridge(graph, AsyncKapsoClient())
     app = create_app(bridge)  # from langchain_kapso.server
     ```
+
+    When the checkpointer has to be created at startup (e.g. ``AsyncPostgresSaver``),
+    pass ``graph=None`` and set ``bridge.graph`` in the app's ``lifespan``.
     """
 
     def __init__(
         self,
-        graph: Any,
+        graph: Any | None,
         client: AsyncKapsoClient,
         webhook_secret: str | None = None,
         reply_extractor: Callable[[Mapping[str, Any]], str | None] = last_ai_text,
@@ -116,6 +119,8 @@ class KapsoBridge:
                     "kapso_contact_name": message.contact_name,
                 }
             }
+            if self.graph is None:
+                raise RuntimeError("KapsoBridge.graph is not set; assign it before receiving messages.")
             state = await self.graph.ainvoke(
                 {"messages": [HumanMessage(content=message.text)]}, config
             )

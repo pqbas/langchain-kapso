@@ -44,6 +44,7 @@ Ideas for the next versions, roughly in priority order.
 ## Reliability and packaging
 
 - [ ] Log every reply sent, and failures with the conversation id.
-- [ ] Pluggable store for processed webhook keys (Redis, Postgres), so retries are not processed twice across restarts or workers.
+- [x] Persistent memory with PostgreSQL (`docs/postgres.md`, `lifespan` in `create_app`).
+- [ ] Pluggable store for processed webhook keys and per-chat locks (Redis, Postgres), so several workers can run at once.
 - [ ] Send to business-scoped user ids (`recipient`) when there is no phone number.
 - [ ] Publish to PyPI and add CI (tests and type checks on each push).

@@ -59,3 +59,35 @@ def test_server_answers_and_runs_agent(recorder):
 
     # The background task ran the graph and sent the reply
     assert recorder.bodies()[-1]["text"] == {"body": "Hola (1)"}
+
+
+def test_lifespan_runs_on_startup_and_can_set_the_graph(recorder):
+    from contextlib import asynccontextmanager
+
+    http = httpx.AsyncClient(transport=httpx.MockTransport(recorder))
+    client = AsyncKapsoClient(api_key="k", phone_number_id=PHONE_NUMBER_ID, http_client=http)
+    bridge = KapsoBridge(None, client, webhook_secret=SECRET)
+    events = []
+
+    @asynccontextmanager
+    async def lifespan(app):
+        bridge.graph = echo_graph()  # e.g. compiled with AsyncPostgresSaver here
+        events.append("start")
+        yield
+        events.append("stop")
+
+    with TestClient(create_app(bridge, lifespan=lifespan)) as test_client:
+        body, headers = webhook_request(received_payload("Hola"))
+        assert test_client.post("/webhooks/whatsapp", content=body, headers=headers).status_code == 200
+    assert events == ["start", "stop"]
+    assert recorder.bodies()[-1]["text"] == {"body": "Hola (1)"}
+
+
+async def test_bridge_without_graph_fails_clearly(recorder):
+    import pytest
+
+    http = httpx.AsyncClient(transport=httpx.MockTransport(recorder))
+    client = AsyncKapsoClient(api_key="k", phone_number_id=PHONE_NUMBER_ID, http_client=http)
+    bridge = KapsoBridge(None, client, webhook_secret=SECRET)
+    with pytest.raises(RuntimeError, match="graph is not set"):
+        await bridge.handle(*webhook_request(received_payload("Hola")))

@@ -98,6 +98,7 @@ and add a webhook in Kapso for `whatsapp.message.received` pointing to
 ## Docs
 
 - [Human handoff](docs/human-handoff.md): hand a chat to a person in the Kapso inbox and resume the agent afterwards.
+- [Memory in PostgreSQL](docs/postgres.md): keep every chat's memory across restarts.
 - [WhatsApp tools](docs/whatsapp-tools.md): let any agent send messages, read conversations and hand off.
 - [langchain-kapso and the Kapso MCP](docs/kapso-mcp.md): when to use each one.
 
