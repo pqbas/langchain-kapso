@@ -86,46 +86,11 @@ and add a webhook in Kapso for `whatsapp.message.received` pointing to
 `https://<your-host>/webhooks/whatsapp`. A fuller example with tools is in
 [`examples/support_agent.py`](examples/support_agent.py).
 
-## Human handoff
+## Docs
 
-The agent can hand a conversation to a person on your team. The conversation is
-assigned to them in the Kapso inbox, and the bridge stops answering it until they
-unassign it; then the agent takes over again with the same memory.
-
-```python
-from langchain_kapso import KapsoClient, KapsoHumanHandoffTool
-
-# The team member who receives the chats, from client.list_users() (use "user_id")
-handoff = KapsoHumanHandoffTool(client=KapsoClient(), handoff_user_id="...")
-tools = [get_order_status, handoff]
-```
-
-The agent calls it with a short summary, which shows up as the assignment note,
-so the person does not have to read the whole chat. You can also set
-`KAPSO_HANDOFF_USER_ID` instead of passing `handoff_user_id`.
-
-Nodes and tools can also read who they are talking to from the config, in
-`config["configurable"]["kapso_phone_number"]` and `["kapso_contact_name"]`.
-
-## Use WhatsApp as a tool
-
-```python
-from langchain_kapso import KapsoClient, KapsoToolkit
-
-tools = KapsoToolkit(client=KapsoClient()).get_tools()
-model_with_tools = model.bind_tools(tools)
-```
-
-| Tool | What it does |
-| --- | --- |
-| `kapso_send_text` | Send a text message |
-| `kapso_send_buttons` | Send up to 3 reply buttons |
-| `kapso_get_messages` | Read a conversation as a transcript |
-| `kapso_list_conversations` | List conversations with their last message |
-| `kapso_human_handoff` | Hand the conversation to a person (with `handoff_user_id`) |
-
-WhatsApp only allows free-form messages within 24 hours of the customer's last
-message; outside that window you need an approved template.
+- [Human handoff](docs/human-handoff.md): hand a chat to a person in the Kapso inbox and resume the agent afterwards.
+- [WhatsApp tools](docs/whatsapp-tools.md): let any agent send messages, read conversations and hand off.
+- [langchain-kapso and the Kapso MCP](docs/kapso-mcp.md): when to use each one.
 
 ## Development
 
