@@ -108,9 +108,10 @@ and human handoff is in [`examples/support_agent.py`](examples/support_agent.py)
 
 ## Docs
 
-- [Human handoff](docs/human-handoff.md): hand a chat to a person in the Kapso inbox and resume the agent afterwards.
+- [How the bridge works](docs/bridge.md): what happens with each message, and the customer data your agent receives.
+- [Human handoff](docs/human-handoff.md): pass a chat to a person in the Kapso inbox and resume the agent afterwards.
 - [Memory in PostgreSQL](docs/postgres.md): keep every chat's memory across restarts.
-- [WhatsApp tools](docs/whatsapp-tools.md): let any agent send messages, read conversations and hand off.
+- [WhatsApp tools](docs/whatsapp-tools.md): let agents send messages, read conversations and hand off on their own.
 - [langchain-kapso and the Kapso MCP](docs/kapso-mcp.md): when to use each one.
 
 ## Development

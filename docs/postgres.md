@@ -1,35 +1,49 @@
 # Memory in PostgreSQL
 
-The memory of each chat is the LangGraph checkpointer, so moving it to PostgreSQL only
-changes how the graph is compiled. Chats then survive restarts and deploys.
+By default the examples keep each chat's memory in `InMemorySaver`, which is lost when the
+server restarts. To keep it, use LangGraph's PostgreSQL checkpointer. The bridge does not
+change; only the way the graph is compiled does.
 
-```bash
-uv add langgraph-checkpoint-postgres "psycopg[binary,pool]"
-```
+## Setup
 
-`AsyncPostgresSaver` has to be created once the server is running, so the graph is
-compiled in the app's `lifespan` and assigned to the bridge:
+1. Install the checkpointer:
 
-```python
-from contextlib import asynccontextmanager
+   ```bash
+   uv add langgraph-checkpoint-postgres "psycopg[binary,pool]"
+   ```
 
-from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+2. Add your database to `.env`:
 
-bridge = KapsoBridge(None, AsyncKapsoClient())  # the graph is set at startup
+   ```bash
+   DATABASE_URL=postgresql://user:password@localhost:5432/agent
+   ```
+
+3. Compile the graph when the server starts. `AsyncPostgresSaver` needs the server to be
+   running, so instead of passing the graph to the bridge right away, pass `None` and set
+   it in the app's `lifespan`:
+
+   ```python
+   import os
+   from contextlib import asynccontextmanager
+
+   from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+
+   bridge = KapsoBridge(None, AsyncKapsoClient())  # the graph is set at startup
 
 
-@asynccontextmanager
-async def lifespan(app):
-    async with AsyncPostgresSaver.from_conn_string(DATABASE_URL) as checkpointer:
-        await checkpointer.setup()  # creates the checkpoint tables the first time
-        bridge.graph = builder.compile(checkpointer=checkpointer)
-        yield
+   @asynccontextmanager
+   async def lifespan(app):
+       async with AsyncPostgresSaver.from_conn_string(os.environ["DATABASE_URL"]) as checkpointer:
+           await checkpointer.setup()  # creates the tables the first time
+           bridge.graph = builder.compile(checkpointer=checkpointer)
+           yield
 
 
-app = create_app(bridge, lifespan=lifespan)
-```
+   app = create_app(bridge, lifespan=lifespan)
+   ```
 
-The full example is in [`examples/postgres.py`](../examples/postgres.py).
+The full example is in [`examples/postgres.py`](../examples/postgres.py). Any other LangGraph
+checkpointer, such as SQLite or Redis, works the same way.
 
 ## Running more than one server
 
