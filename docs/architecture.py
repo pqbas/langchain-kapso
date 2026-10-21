@@ -14,7 +14,7 @@ from pathlib import Path
 
 DOCS = Path(__file__).resolve().parent
 ASSETS = DOCS / "assets"
-W, H = 1400, 520
+W, H = 1400, 540
 FONT = "Helvetica, Arial, sans-serif"
 INK, MUTED, LINE = "#1f2328", "#59636e", "#1f2328"
 out: list[str] = []
@@ -58,44 +58,44 @@ def arrow(x1, y1, x2, y2, label="", lx=None, ly=None, color=LINE):
 
 
 # Customer
-simple_icon("whatsapp", 80, 105, 84, "#25D366")
-text(122, 222, "Customer\non WhatsApp", 16)
+simple_icon("whatsapp", 62, 92, 120, "#25D366")
+text(122, 240, "Customer\non WhatsApp", 17)
 
 # Kapso
-box(270, 50, 330, 420, fill="#f6f8fa")
-kapso_icon(288, 60, 42)
-text(340, 92, "Kapso", 22, anchor="start", weight="bold")
-box(300, 115, 270, 90)
-text(435, 155, "WhatsApp API", 16, weight="bold")
-text(435, 180, "delivers and sends messages", 13, MUTED)
+box(270, 40, 330, 450, fill="#f6f8fa")
+kapso_icon(286, 52, 60)
+text(356, 94, "Kapso", 28, anchor="start", weight="bold")
+box(300, 125, 270, 90)
+text(435, 165, "WhatsApp API", 16, weight="bold")
+text(435, 190, "delivers and sends messages", 13, MUTED)
 box(300, 345, 270, 90)
 text(435, 385, "Inbox", 16, weight="bold")
 text(435, 410, "your team answers here", 13, MUTED)
 
 # Your server
-box(680, 50, 700, 420, fill="#f6f8fa")
-text(700, 92, "Your server", 22, anchor="start", weight="bold")
-box(705, 115, 300, 160, fill="#fff8e1", stroke="#e3b341")
-text(855, 148, "langchain-kapso bridge", 16, weight="bold")
-text(728, 182, "verifies the webhook signature\nskips retried deliveries\nkeeps each chat in order\npauses during a handoff", 13.5, INK, anchor="start")
-box(1075, 115, 280, 120, fill="#eef7ee", stroke="#57ab5a")
-simple_icon("langchain", 1090, 128, 44, "#1C3C3C")
-text(1142, 156, "Your LangGraph agent", 16, anchor="start", weight="bold")
-text(1215, 192, "prompt, tools and memory\none thread per chat", 13, MUTED)
+box(680, 40, 700, 450, fill="#f6f8fa")
+text(700, 94, "Your server", 28, anchor="start", weight="bold")
+box(705, 125, 300, 160, fill="#fff8e1", stroke="#e3b341")
+text(855, 158, "langchain-kapso bridge", 16, weight="bold")
+text(728, 192, "verifies the webhook signature\nskips retried deliveries\nkeeps each chat in order\npauses during a handoff", 13.5, INK, anchor="start")
+box(1075, 125, 280, 125, fill="#eef7ee", stroke="#57ab5a")
+simple_icon("langchain", 1088, 132, 56, "#1C3C3C")
+text(1152, 166, "Your LangGraph agent", 16, anchor="start", weight="bold")
+text(1215, 207, "prompt, tools and memory\none thread per chat", 13, MUTED)
 box(1075, 345, 280, 90, fill="#ffffff")
 text(1215, 385, "kapso_human_handoff", 15, weight="bold")
 text(1215, 410, "one of the agent's tools", 13, MUTED)
 
 # Flow
-arrow(172, 140, 296, 140, "message")
-arrow(300, 185, 176, 185, "reply", ly=203)
-arrow(570, 140, 701, 140, "webhook")
-arrow(705, 185, 574, 185, "reply", ly=203)
-arrow(1005, 150, 1071, 150, "runs", ly=140)
-arrow(1075, 200, 1009, 200, "answer", ly=218)
-arrow(1215, 235, 1215, 341)
+arrow(190, 150, 296, 150, "message")
+arrow(300, 195, 194, 195, "reply", ly=213)
+arrow(570, 150, 701, 150, "webhook")
+arrow(705, 195, 574, 195, "reply", ly=213)
+arrow(1005, 165, 1071, 165, "runs", ly=155)
+arrow(1075, 215, 1009, 215, "answer", ly=233)
+arrow(1215, 250, 1215, 341)
 arrow(1075, 390, 574, 390, "assigns the chat with a summary", ly=380)
-arrow(300, 380, 135, 262, "a person\nanswers", lx=180, ly=355)
+arrow(300, 385, 140, 285, "a person\nanswers", lx=175, ly=375)
 
 svg = (
     f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">\n'
