@@ -6,7 +6,7 @@ Ideas for the next versions, roughly in priority order.
 
 Kapso's official adapters (Hermes Agent, OpenClaw, Chat SDK) already handle these.
 
-- [ ] Split replies longer than WhatsApp's text limit into several messages, so a long answer from the agent does not fail.
+- [x] Split replies longer than WhatsApp's 4096-character limit into several messages, cut between paragraphs, lines or sentences (`split_message`).
 - [ ] Send images, audio, video and documents from the agent, not only text.
 
 ## Human handoff

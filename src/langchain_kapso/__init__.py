@@ -10,6 +10,7 @@ from langchain_kapso.tools import (
     KapsoSendTextTool,
     KapsoToolkit,
 )
+from langchain_kapso.text import WHATSAPP_TEXT_LIMIT, split_message
 from langchain_kapso.webhook import InboundMessage, parse_inbound_messages, verify_signature
 
 __all__ = [
@@ -25,7 +26,9 @@ __all__ = [
     "KapsoSendButtonsTool",
     "KapsoSendTextTool",
     "KapsoToolkit",
+    "WHATSAPP_TEXT_LIMIT",
     "last_ai_text",
     "parse_inbound_messages",
+    "split_message",
     "verify_signature",
 ]

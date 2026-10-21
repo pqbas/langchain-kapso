@@ -13,6 +13,7 @@ from typing import Any
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 
 from langchain_kapso.client import AsyncKapsoClient
+from langchain_kapso.text import WHATSAPP_TEXT_LIMIT, split_message
 from langchain_kapso.webhook import InboundMessage, parse_inbound_messages, verify_signature
 
 logger = logging.getLogger(__name__)
@@ -58,6 +59,7 @@ class KapsoBridge:
         reply_extractor: Callable[[Mapping[str, Any]], str | None] = last_ai_text,
         typing_indicator: bool = True,
         pause_when_assigned: bool = True,
+        max_message_length: int = WHATSAPP_TEXT_LIMIT,
         max_tracked_events: int = 10_000,
     ):
         self.graph = graph
@@ -66,6 +68,7 @@ class KapsoBridge:
         self.reply_extractor = reply_extractor
         self.typing_indicator = typing_indicator
         self.pause_when_assigned = pause_when_assigned
+        self.max_message_length = max_message_length
         self._locks: defaultdict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._seen: OrderedDict[str, None] = OrderedDict()
         self._max_tracked = max_tracked_events
@@ -126,7 +129,9 @@ class KapsoBridge:
             )
             reply = self.reply_extractor(state)
             if reply and message.from_phone:
-                await self.client.send_text(message.from_phone, reply)
+                # Long replies go out as several messages, in order
+                for chunk in split_message(reply, self.max_message_length):
+                    await self.client.send_text(message.from_phone, chunk)
             return reply
 
     async def _is_assigned(self, conversation_id: str) -> bool:

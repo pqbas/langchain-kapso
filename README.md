@@ -27,6 +27,7 @@ This package packs that glue, so you write the agent and it handles the WhatsApp
 - Works with any LangGraph checkpointer, such as PostgreSQL, so every chat's memory survives restarts.
 - Verifies webhook signatures, skips retried deliveries and processes the messages of each chat in order.
 - Answers Kapso right away and runs the agent in the background, so slow replies do not trigger retries.
+- Splits long replies into several WhatsApp messages, cutting between paragraphs or sentences.
 - Hands a chat to a person in the Kapso inbox and resumes the agent when they unassign it.
 - Includes WhatsApp tools for LangChain agents to send messages, read conversations and hand off.
 - Provides a sync and async client for the Kapso WhatsApp and Platform APIs.

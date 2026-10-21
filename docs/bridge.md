@@ -18,7 +18,9 @@ as a web server that Kapso calls for every customer message.
 6. The message is marked as read and the customer sees "typing…".
 7. The graph runs with `thread_id` set to the Kapso conversation id, so it continues that
    customer's history. Messages of the same chat run one at a time, in order.
-8. The last AI message of the result is sent to the customer.
+8. The last AI message of the result is sent to the customer. Replies longer than
+   WhatsApp's 4096-character limit go out as several messages, cut between paragraphs,
+   lines or sentences when possible.
 
 ## What your graph needs
 
@@ -69,4 +71,5 @@ def agent(state: MessagesState, config: RunnableConfig) -> dict:
 | `webhook_secret` | `KAPSO_WEBHOOK_SECRET` | Secret used to verify webhooks |
 | `typing_indicator` | `True` | Show "typing…" while the agent works |
 | `pause_when_assigned` | `True` | Do not answer chats assigned to a person |
+| `max_message_length` | `4096` | Longest WhatsApp message; longer replies are split |
 | `reply_extractor` | last AI message | Function that picks the text to send from the graph result |

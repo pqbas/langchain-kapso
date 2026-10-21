@@ -12,6 +12,7 @@ from langchain_core.tools.base import ArgsSchema
 from pydantic import BaseModel, ConfigDict, Field
 
 from langchain_kapso.client import AsyncKapsoClient, KapsoClient
+from langchain_kapso.text import split_message
 
 
 def _message_line(message: dict[str, Any]) -> str:
@@ -70,12 +71,22 @@ class KapsoSendTextTool(_KapsoTool):
     args_schema: ArgsSchema | None = SendTextInput
 
     def _run(self, to: str, body: str, **kwargs: Any) -> str:
-        response = self.client.send_text(to, body)
-        return f"Message sent, id={response.get('messages', [{}])[0].get('id')}"
+        ids = [_message_id(self.client.send_text(to, chunk)) for chunk in split_message(body)]
+        return _sent(ids)
 
     async def _arun(self, to: str, body: str, **kwargs: Any) -> str:
-        response = await self._call_async("send_text", to, body)
-        return f"Message sent, id={response.get('messages', [{}])[0].get('id')}"
+        ids = [_message_id(await self._call_async("send_text", to, chunk)) for chunk in split_message(body)]
+        return _sent(ids)
+
+
+def _message_id(response: dict[str, Any]) -> str | None:
+    return response.get("messages", [{}])[0].get("id")
+
+
+def _sent(ids: list[str | None]) -> str:
+    if len(ids) == 1:
+        return f"Message sent, id={ids[0]}"
+    return f"Message sent in {len(ids)} parts, ids={ids}"
 
 
 class Button(BaseModel):

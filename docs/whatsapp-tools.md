@@ -24,7 +24,7 @@ the tools use it when the graph runs asynchronously.
 
 | Tool | Input | Returns |
 | --- | --- | --- |
-| `kapso_send_text` | `to` phone number, `body` | The id of the sent message |
+| `kapso_send_text` | `to` phone number, `body` | The id of the sent message; long texts are sent in several parts |
 | `kapso_send_buttons` | `to`, `body`, up to 3 `buttons` with `id` and `title` | The id of the sent message |
 | `kapso_get_messages` | `conversation_id`, `limit` | The chat as a transcript, oldest first |
 | `kapso_list_conversations` | optional `status`, `phone_number`, `limit` | Conversations with their last message |
