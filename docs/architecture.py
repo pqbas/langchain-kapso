@@ -58,13 +58,13 @@ def arrow(x1, y1, x2, y2, label="", lx=None, ly=None, color=LINE):
 
 
 # Customer
-simple_icon("whatsapp", 98, 128, 48, "#25D366")
-text(122, 210, "Customer\non WhatsApp", 15)
+simple_icon("whatsapp", 80, 105, 84, "#25D366")
+text(122, 222, "Customer\non WhatsApp", 16)
 
 # Kapso
 box(270, 50, 330, 420, fill="#f6f8fa")
-kapso_icon(290, 66, 26)
-text(326, 86, "Kapso", 18, anchor="start", weight="bold")
+kapso_icon(288, 60, 42)
+text(340, 92, "Kapso", 22, anchor="start", weight="bold")
 box(300, 115, 270, 90)
 text(435, 155, "WhatsApp API", 16, weight="bold")
 text(435, 180, "delivers and sends messages", 13, MUTED)
@@ -74,28 +74,28 @@ text(435, 410, "your team answers here", 13, MUTED)
 
 # Your server
 box(680, 50, 700, 420, fill="#f6f8fa")
-text(700, 86, "Your server", 18, anchor="start", weight="bold")
+text(700, 92, "Your server", 22, anchor="start", weight="bold")
 box(705, 115, 300, 160, fill="#fff8e1", stroke="#e3b341")
 text(855, 148, "langchain-kapso bridge", 16, weight="bold")
 text(728, 182, "verifies the webhook signature\nskips retried deliveries\nkeeps each chat in order\npauses during a handoff", 13.5, INK, anchor="start")
 box(1075, 115, 280, 120, fill="#eef7ee", stroke="#57ab5a")
-simple_icon("langchain", 1095, 135, 30, "#1C3C3C")
-text(1135, 156, "Your LangGraph agent", 16, anchor="start", weight="bold")
+simple_icon("langchain", 1090, 128, 44, "#1C3C3C")
+text(1142, 156, "Your LangGraph agent", 16, anchor="start", weight="bold")
 text(1215, 192, "prompt, tools and memory\none thread per chat", 13, MUTED)
 box(1075, 345, 280, 90, fill="#ffffff")
 text(1215, 385, "kapso_human_handoff", 15, weight="bold")
 text(1215, 410, "one of the agent's tools", 13, MUTED)
 
 # Flow
-arrow(170, 140, 296, 140, "message")
-arrow(300, 185, 174, 185, "reply", ly=203)
+arrow(172, 140, 296, 140, "message")
+arrow(300, 185, 176, 185, "reply", ly=203)
 arrow(570, 140, 701, 140, "webhook")
 arrow(705, 185, 574, 185, "reply", ly=203)
 arrow(1005, 150, 1071, 150, "runs", ly=140)
 arrow(1075, 200, 1009, 200, "answer", ly=218)
 arrow(1215, 235, 1215, 341)
 arrow(1075, 390, 574, 390, "assigns the chat with a summary", ly=380)
-arrow(300, 380, 140, 248, "a person\nanswers", lx=180, ly=345)
+arrow(300, 380, 135, 262, "a person\nanswers", lx=180, ly=355)
 
 svg = (
     f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}">\n'
