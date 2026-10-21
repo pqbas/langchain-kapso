@@ -2,6 +2,8 @@
 
 Connect LangChain and LangGraph agents to WhatsApp through [Kapso](https://kapso.ai).
 
+> Community integration, not affiliated with Kapso or LangChain.
+
 - **Bridge**: receive Kapso webhooks, run your LangGraph graph and reply on WhatsApp.
   Each WhatsApp conversation is a LangGraph thread, so a checkpointer gives every
   chat its own memory.
@@ -12,7 +14,8 @@ Connect LangChain and LangGraph agents to WhatsApp through [Kapso](https://kapso
 ## Install
 
 ```bash
-uv add "langchain-kapso[server]"   # or: pip install "langchain-kapso[server]"
+uv add "langchain-kapso[server] @ git+https://github.com/pqbas/langchain-kapso"
+# or: pip install "langchain-kapso[server] @ git+https://github.com/pqbas/langchain-kapso"
 ```
 
 Set your credentials, from the Kapso dashboard:
@@ -76,6 +79,21 @@ To receive messages, expose the port (for example `cloudflared tunnel --url http
 and add a webhook in Kapso for `whatsapp.message.received` pointing to
 `https://<your-host>/webhooks/whatsapp`. A fuller example with tools is in
 [`examples/support_agent.py`](examples/support_agent.py).
+
+## How it works
+
+For every customer message the bridge:
+
+1. Verifies the `X-Webhook-Signature` and skips retried deliveries (`X-Idempotency-Key`).
+2. Answers Kapso with `200` right away and runs the agent in the background, since
+   Kapso retries slow or failed deliveries.
+3. Marks the message as read and shows the typing indicator.
+4. Calls `graph.ainvoke` with `thread_id` set to the Kapso conversation id. Messages
+   of the same conversation run one at a time and in order.
+5. Sends the last AI message back to the customer.
+
+Nodes and tools can read who they are talking to from the config, in
+`config["configurable"]["kapso_phone_number"]` and `["kapso_contact_name"]`.
 
 ## Use WhatsApp as a tool
 
