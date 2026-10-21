@@ -84,17 +84,27 @@ bridge = KapsoBridge(graph, AsyncKapsoClient())
 app = create_app(bridge)  # receives messages on POST /webhooks/whatsapp
 ```
 
-```bash
-uvicorn quickstart:app --port 8000
-```
+You never call `graph.invoke` yourself. When a customer writes on WhatsApp, the bridge
+runs the graph with that message and sends the answer back.
 
-You never call `graph.invoke` yourself: when a customer writes on WhatsApp, the
-bridge invokes the graph with that message and sends the answer back.
+### Connect it to Kapso
 
-To receive messages, expose the port (for example `cloudflared tunnel --url http://localhost:8000`)
-and add a webhook in Kapso for `whatsapp.message.received` pointing to
-`https://<your-host>/webhooks/whatsapp`. A fuller example with tools is in
-[`examples/support_agent.py`](examples/support_agent.py).
+1. Run the server.
+
+   ```bash
+   uvicorn quickstart:app --port 8000
+   ```
+
+2. Give it a public HTTPS URL. In production that is your deployed server. To try it on
+   your machine, open a temporary tunnel instead, for example
+   `cloudflared tunnel --url http://localhost:8000`.
+
+3. In Kapso, add a webhook to your WhatsApp number for the `whatsapp.message.received`
+   event, pointing to `https://<your-url>/webhooks/whatsapp`, with the same secret you set
+   in `KAPSO_WEBHOOK_SECRET`.
+
+Now write to your number on WhatsApp and the agent answers. A fuller example with tools
+and human handoff is in [`examples/support_agent.py`](examples/support_agent.py).
 
 ## Docs
 
