@@ -1,16 +1,35 @@
-# langchain-kapso
+<h1 align="center">langchain-kapso</h1>
 
-Connect LangChain and LangGraph agents to WhatsApp through [Kapso](https://kapso.ai).
+<p align="center">
+  Run the LangGraph agent that answers your customers on WhatsApp, through <a href="https://kapso.ai">Kapso</a>.<br/>
+  Kapso delivers the messages, your agent answers them, and a person takes over when needed.
+</p>
 
 > [!WARNING]
 > Community integration, not affiliated with Kapso or LangChain.
 
-- **Bridge**: receive Kapso webhooks, run your LangGraph graph and reply on WhatsApp.
-  Each WhatsApp conversation is a LangGraph thread, so a checkpointer gives every
-  chat its own memory.
-- **Tools**: let any agent send messages, send reply buttons, read a conversation and
-  list conversations.
-- **Client**: a small sync and async client for the Kapso WhatsApp API.
+## Features
+
+- **WhatsApp → LangGraph bridge**: every customer message runs your graph and the reply goes back on WhatsApp. You never call `graph.invoke` yourself.
+- **Memory per chat**: each Kapso conversation is a LangGraph thread, so a checkpointer gives every customer their own history.
+- **Production details handled**: signed webhooks are verified, retried deliveries are skipped, Kapso gets a `200` right away while the agent runs in the background, and messages of the same chat are processed in order.
+- **Human handoff**: the agent assigns the chat to a person in the Kapso inbox with a summary, stays quiet while they handle it, and takes over again when they unassign it.
+- **Least privilege tools**: a small set of WhatsApp tools (send, read, hand off) that is safe to give an agent reading untrusted customer messages.
+- **Sync and async client** for the Kapso WhatsApp and Platform APIs.
+
+## langchain-kapso vs Kapso MCP
+
+Kapso's [MCP server](https://docs.kapso.ai/docs/whatsapp/mcp) and this library solve different problems, and work well together.
+
+| | Kapso MCP | langchain-kapso |
+| --- | --- | --- |
+| Made for | Coding and operator agents (Claude Code, Cursor) that manage your Kapso project | The agent in production that answers your customers |
+| Reacts when a customer writes | No, the agent has to start every action | Yes, webhook → graph → reply |
+| Memory, ordering, retries, handoff pause | No | Yes |
+| Tools given to the model | 184 tools, about 34k tokens per call | 5 tools, about 700 tokens |
+| Destructive tools reachable with an API key | Yes (delete contacts, send broadcasts, edit webhooks…) | None |
+
+Use the MCP in your editor to set up and operate Kapso, and langchain-kapso to run the customer-facing agent.
 
 ## Install
 
@@ -81,23 +100,6 @@ and add a webhook in Kapso for `whatsapp.message.received` pointing to
 `https://<your-host>/webhooks/whatsapp`. A fuller example with tools is in
 [`examples/support_agent.py`](examples/support_agent.py).
 
-## How it works
-
-For every customer message the bridge:
-
-1. Verifies the `X-Webhook-Signature` and skips retried deliveries (`X-Idempotency-Key`).
-2. Answers Kapso with `200` right away and runs the agent in the background, since
-   Kapso retries slow or failed deliveries.
-3. Marks the message as read and shows the typing indicator.
-4. Calls `graph.ainvoke` with `thread_id` set to the Kapso conversation id. Messages
-   of the same conversation run one at a time and in order.
-5. Sends the last AI message back to the customer.
-
-If the conversation is assigned to a team member in Kapso, the bridge skips steps 3 to 5.
-
-Nodes and tools can read who they are talking to from the config, in
-`config["configurable"]["kapso_phone_number"]` and `["kapso_contact_name"]`.
-
 ## Human handoff
 
 The agent can hand a conversation to a person on your team. The conversation is
@@ -115,6 +117,9 @@ tools = [get_order_status, handoff]
 The agent calls it with a short summary, which shows up as the assignment note,
 so the person does not have to read the whole chat. You can also set
 `KAPSO_HANDOFF_USER_ID` instead of passing `handoff_user_id`.
+
+Nodes and tools can also read who they are talking to from the config, in
+`config["configurable"]["kapso_phone_number"]` and `["kapso_contact_name"]`.
 
 ## Use WhatsApp as a tool
 
