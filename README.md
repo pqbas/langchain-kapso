@@ -72,45 +72,10 @@ uvicorn quickstart:app --port 8000
 You never call `graph.invoke` yourself: when a customer writes on WhatsApp, the
 bridge invokes the graph with that message and sends the answer back.
 
-## Put a LangGraph agent on WhatsApp
-
-```python
-from langchain_kapso import AsyncKapsoClient, KapsoBridge
-from langchain_kapso.server import create_app
-
-graph = builder.compile(checkpointer=InMemorySaver())  # any graph with a "messages" key
-
-bridge = KapsoBridge(graph, AsyncKapsoClient())
-app = create_app(bridge)  # FastAPI app with POST /webhooks/whatsapp
-```
-
-```bash
-uvicorn my_agent:app --port 8000
-```
-
-Expose the port (for example `cloudflared tunnel --url http://localhost:8000`) and
-create a webhook in Kapso for `whatsapp.message.received` pointing to
-`https://<your-host>/webhooks/whatsapp`.
-
-For every customer message the bridge:
-
-1. Verifies the `X-Webhook-Signature` and ignores retried deliveries (`X-Idempotency-Key`).
-2. Answers Kapso with `200` right away and runs the agent in the background, since
-   Kapso retries slow or failed deliveries.
-3. Marks the message as read and shows the typing indicator.
-4. Calls `graph.ainvoke` with `thread_id` set to the Kapso conversation id. Messages
-   of the same conversation run one at a time and in order.
-5. Sends the last AI message back to the customer.
-
-Nodes and tools can read who they are talking to from the config:
-
-```python
-def agent(state: MessagesState, config: RunnableConfig) -> dict:
-    phone = config["configurable"]["kapso_phone_number"]
-    name = config["configurable"]["kapso_contact_name"]
-```
-
-A complete example is in [`examples/support_agent.py`](examples/support_agent.py).
+To receive messages, expose the port (for example `cloudflared tunnel --url http://localhost:8000`)
+and add a webhook in Kapso for `whatsapp.message.received` pointing to
+`https://<your-host>/webhooks/whatsapp`. A fuller example with tools is in
+[`examples/support_agent.py`](examples/support_agent.py).
 
 ## Use WhatsApp as a tool
 
