@@ -22,9 +22,12 @@ as a web server that Kapso calls for every customer message.
 
 ## What your graph needs
 
-The agent can be anything you build with LangGraph, from a single node to tools, RAG or
-several agents with a supervisor, including agents made with LangChain's `create_agent`.
-The bridge only needs three things from it.
+If your agent follows LangGraph's usual chat conventions, it already works with the bridge
+and you do not need to change anything. That covers graphs built on `MessagesState`,
+agents made with LangChain's `create_agent`, and graphs using `ToolNode` and
+`tools_condition`, whether they are a single node or several agents with a supervisor.
+
+In detail, the bridge relies on these three conventions:
 
 | Requirement | Why | If your graph is different |
 | --- | --- | --- |
