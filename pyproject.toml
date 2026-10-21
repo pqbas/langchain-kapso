@@ -1,0 +1,42 @@
+[project]
+name = "langchain-kapso"
+version = "0.1.0"
+description = "LangChain and LangGraph integration for Kapso, the WhatsApp API for developers"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+keywords = ["langchain", "langgraph", "kapso", "whatsapp", "agents"]
+dependencies = [
+    "httpx>=0.28.1",
+    "langchain-core>=1.6.12",
+]
+
+[project.optional-dependencies]
+server = [
+    "fastapi>=0.158.1",
+    "uvicorn>=0.54.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "langgraph>=1.2.16",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+]
+examples = [
+    "langchain>=1.4.6",
+    "langchain-anthropic>=1.7.6",
+    "langgraph>=1.2.16",
+    "python-dotenv>=1.2.4",
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
