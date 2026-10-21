@@ -93,8 +93,28 @@ For every customer message the bridge:
    of the same conversation run one at a time and in order.
 5. Sends the last AI message back to the customer.
 
+If the conversation is assigned to a team member in Kapso, the bridge skips steps 3 to 5.
+
 Nodes and tools can read who they are talking to from the config, in
 `config["configurable"]["kapso_phone_number"]` and `["kapso_contact_name"]`.
+
+## Human handoff
+
+The agent can hand a conversation to a person on your team. The conversation is
+assigned to them in the Kapso inbox, and the bridge stops answering it until they
+unassign it; then the agent takes over again with the same memory.
+
+```python
+from langchain_kapso import KapsoClient, KapsoHumanHandoffTool
+
+# The team member who receives the chats, from client.list_users() (use "user_id")
+handoff = KapsoHumanHandoffTool(client=KapsoClient(), handoff_user_id="...")
+tools = [get_order_status, handoff]
+```
+
+The agent calls it with a short summary, which shows up as the assignment note,
+so the person does not have to read the whole chat. You can also set
+`KAPSO_HANDOFF_USER_ID` instead of passing `handoff_user_id`.
 
 ## Use WhatsApp as a tool
 
@@ -111,6 +131,7 @@ model_with_tools = model.bind_tools(tools)
 | `kapso_send_buttons` | Send up to 3 reply buttons |
 | `kapso_get_messages` | Read a conversation as a transcript |
 | `kapso_list_conversations` | List conversations with their last message |
+| `kapso_human_handoff` | Hand the conversation to a person (with `handoff_user_id`) |
 
 WhatsApp only allows free-form messages within 24 hours of the customer's last
 message; outside that window you need an approved template.
@@ -125,5 +146,5 @@ uv run pytest
 ## Status
 
 Early version, tested end to end with the Kapso sandbox. See [TODO.md](TODO.md) for
-what comes next: human handoff, merging bursts of messages, the 24-hour window,
+what comes next: merging bursts of messages, the 24-hour window,
 multimodal messages and prompt management.

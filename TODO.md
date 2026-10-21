@@ -4,10 +4,11 @@ Ideas for the next versions, roughly in priority order.
 
 ## Human handoff
 
-- [ ] `kapso_human_handoff` tool: the agent calls it when a case needs a person, with a short summary for the operator.
-- [ ] The bridge stops answering a conversation while it is in handoff, so the AI never replies on top of a human in the Kapso inbox.
-- [ ] A way to give the conversation back to the agent (tool, API call or conversation status), resuming the same LangGraph thread.
-- Note: Kapso's native handoff only applies to Kapso workflows, so external agents need this on the bridge side. Options to store the flag: conversation metadata, assignment (`assigned_user_id`) or the LangGraph state.
+- [x] `kapso_human_handoff` tool: the agent calls it when a case needs a person, with a short summary for the operator.
+- [x] The bridge stops answering a conversation while it is in handoff, so the AI never replies on top of a human in the Kapso inbox.
+- [x] A way to give the conversation back to the agent: unassign it in the Kapso inbox or call `unassign_conversation`; the agent resumes the same LangGraph thread.
+- Built on Kapso conversation assignments, since Kapso's native handoff only applies to Kapso workflows. The bridge checks the assignment on each message (one API call).
+- [ ] React to assignment changes through webhooks instead of checking on every message, if Kapso exposes such an event.
 
 ## Bursts of messages
 

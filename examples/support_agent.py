@@ -16,7 +16,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode, tools_condition
 
-from langchain_kapso import AsyncKapsoClient, KapsoBridge
+from langchain_kapso import AsyncKapsoClient, KapsoBridge, KapsoClient, KapsoHumanHandoffTool
 from langchain_kapso.server import create_app
 
 load_dotenv()
@@ -26,7 +26,8 @@ model = init_chat_model("anthropic:claude-haiku-5-5")
 SYSTEM_PROMPT = (
     "You are the support agent of an online store, chatting on WhatsApp. "
     "Answer briefly and kindly, in the customer's language. "
-    "Use the tools to look up data, never make it up."
+    "Use the tools to look up data, never make it up. "
+    "If the customer asks for a person or you cannot help, hand the conversation off."
 )
 
 ORDERS = {
@@ -41,7 +42,11 @@ def get_order_status(order_id: str) -> dict:
     return ORDERS.get(order_id, {"error": f"order {order_id} not found"})
 
 
-tools = [get_order_status]
+# Hands the chat to a person in the Kapso inbox (KAPSO_HANDOFF_USER_ID in .env).
+# While the conversation is assigned, the bridge does not run the agent.
+handoff = KapsoHumanHandoffTool(client=KapsoClient())
+
+tools = [get_order_status, handoff]
 model_with_tools = model.bind_tools(tools)
 
 

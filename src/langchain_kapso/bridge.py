@@ -37,7 +37,9 @@ class KapsoBridge:
     Each Kapso conversation maps to one LangGraph thread (``thread_id`` is the
     conversation id), so a graph compiled with a checkpointer keeps the memory
     of each chat. Messages of the same conversation are processed one at a time
-    and in order; different conversations run concurrently.
+    and in order; different conversations run concurrently. While a conversation is
+    assigned to a team member in Kapso (see ``kapso_human_handoff``), the agent does
+    not answer it.
 
     ```python
     bridge = KapsoBridge(graph, AsyncKapsoClient())
@@ -52,6 +54,7 @@ class KapsoBridge:
         webhook_secret: str | None = None,
         reply_extractor: Callable[[Mapping[str, Any]], str | None] = last_ai_text,
         typing_indicator: bool = True,
+        pause_when_assigned: bool = True,
         max_tracked_events: int = 10_000,
     ):
         self.graph = graph
@@ -59,6 +62,7 @@ class KapsoBridge:
         self.webhook_secret = webhook_secret or os.environ.get("KAPSO_WEBHOOK_SECRET")
         self.reply_extractor = reply_extractor
         self.typing_indicator = typing_indicator
+        self.pause_when_assigned = pause_when_assigned
         self._locks: defaultdict[str, asyncio.Lock] = defaultdict(asyncio.Lock)
         self._seen: OrderedDict[str, None] = OrderedDict()
         self._max_tracked = max_tracked_events
@@ -92,6 +96,12 @@ class KapsoBridge:
     async def process(self, message: InboundMessage) -> str | None:
         """Run the graph for one customer message and send the reply on WhatsApp."""
         async with self._locks[message.conversation_id]:
+            # Human handoff: while a team member is assigned in the Kapso inbox,
+            # the agent stays quiet and leaves the message unread for them
+            if self.pause_when_assigned and await self._is_assigned(message.conversation_id):
+                logger.info("Conversation %s is assigned to a human; agent paused", message.conversation_id)
+                return None
+
             try:
                 await self.client.mark_read(message.message_id, typing_indicator=self.typing_indicator)
             except Exception:
@@ -113,6 +123,14 @@ class KapsoBridge:
             if reply and message.from_phone:
                 await self.client.send_text(message.from_phone, reply)
             return reply
+
+    async def _is_assigned(self, conversation_id: str) -> bool:
+        try:
+            return await self.client.get_active_assignment(conversation_id) is not None
+        except Exception:
+            # If Kapso can't be reached, keep answering rather than going silent
+            logger.exception("Could not check assignment of conversation %s", conversation_id)
+            return False
 
     async def handle(self, raw_body: bytes, headers: Mapping[str, str]) -> list[str | None]:
         """Verify, parse and process a delivery in one call (useful in tests and scripts)."""

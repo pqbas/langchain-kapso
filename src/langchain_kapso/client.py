@@ -1,4 +1,4 @@
-"""HTTP client for the Kapso WhatsApp API (Meta Cloud API proxy)."""
+"""HTTP client for the Kapso WhatsApp API (Meta Cloud API proxy) and Platform API."""
 
 from __future__ import annotations
 
@@ -8,6 +8,7 @@ from typing import Any
 import httpx
 
 DEFAULT_BASE_URL = "https://api.kapso.ai/meta/whatsapp/v24.0"
+DEFAULT_PLATFORM_URL = "https://api.kapso.ai/platform/v1"
 
 
 class KapsoError(Exception):
@@ -61,6 +62,7 @@ class _BaseKapsoClient:
         api_key: str | None = None,
         phone_number_id: str | None = None,
         base_url: str = DEFAULT_BASE_URL,
+        platform_url: str = DEFAULT_PLATFORM_URL,
         timeout: float = 30.0,
     ):
         self.api_key = api_key or os.environ.get("KAPSO_API_KEY")
@@ -72,6 +74,7 @@ class _BaseKapsoClient:
                 "Missing phone number id. Pass phone_number_id or set KAPSO_PHONE_NUMBER_ID."
             )
         self.base_url = base_url.rstrip("/")
+        self.platform_url = platform_url.rstrip("/")
         self.timeout = timeout
 
     @property
@@ -80,6 +83,13 @@ class _BaseKapsoClient:
 
     def _url(self, path: str) -> str:
         return f"{self.base_url}/{self.phone_number_id}/{path.lstrip('/')}"
+
+    def _assignments_url(self, conversation_id: str) -> str:
+        return f"{self.platform_url}/whatsapp/conversations/{conversation_id}/assignments"
+
+    @staticmethod
+    def _active(response: dict[str, Any]) -> dict[str, Any] | None:
+        return next((a for a in response.get("data", []) if a.get("active")), None)
 
     @staticmethod
     def _handle(response: httpx.Response) -> dict[str, Any]:
@@ -103,13 +113,13 @@ class KapsoClient(_BaseKapsoClient):
         super().__init__(*args, **kwargs)
         self._http = http_client or httpx.Client(timeout=self.timeout)
 
-    def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
-        return self._handle(self._http.post(self._url(path), json=payload, headers=self._headers))
+    def _post(self, path: str, payload: dict[str, Any], url: str | None = None) -> dict[str, Any]:
+        response = self._http.post(url or self._url(path), json=payload, headers=self._headers)
+        return self._handle(response)
 
-    def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
-        return self._handle(
-            self._http.get(self._url(path), params=_clean(params), headers=self._headers)
-        )
+    def _get(self, path: str, params: dict[str, Any], url: str | None = None) -> dict[str, Any]:
+        response = self._http.get(url or self._url(path), params=_clean(params), headers=self._headers)
+        return self._handle(response)
 
     def send_text(self, to: str, body: str) -> dict[str, Any]:
         """Send a text message. Requires an open 24-hour customer service window."""
@@ -139,6 +149,36 @@ class KapsoClient(_BaseKapsoClient):
         )
 
 
+    def list_users(self) -> dict[str, Any]:
+        """List project members. Use their ``user_id`` (not ``id``) for assignments."""
+        return self._get("", {}, url=f"{self.platform_url}/users")
+
+    def list_assignments(self, conversation_id: str) -> dict[str, Any]:
+        """List the team-member assignments of a conversation, most recent first."""
+        return self._get("", {}, url=self._assignments_url(conversation_id))
+
+    def get_active_assignment(self, conversation_id: str) -> dict[str, Any] | None:
+        """Return the active assignment of a conversation, or None if nobody is assigned."""
+        return self._active(self.list_assignments(conversation_id))
+
+    def assign_conversation(
+        self, conversation_id: str, user_id: str, notes: str | None = None
+    ) -> dict[str, Any]:
+        """Assign a conversation to a project member, who sees it in the Kapso inbox."""
+        assignment = _clean({"user_id": user_id, "notes": notes})
+        return self._post("", {"assignment": assignment}, url=self._assignments_url(conversation_id))
+
+
+    def unassign_conversation(self, conversation_id: str) -> dict[str, Any] | None:
+        """Deactivate the active assignment, giving the conversation back to the agent."""
+        active = self.get_active_assignment(conversation_id)
+        if active is None:
+            return None
+        url = f"{self._assignments_url(conversation_id)}/{active['id']}"
+        response = self._http.patch(url, json={"assignment": {"active": False}}, headers=self._headers)
+        return self._handle(response)
+
+
 class AsyncKapsoClient(_BaseKapsoClient):
     """Asynchronous version of :class:`KapsoClient`."""
 
@@ -146,12 +186,14 @@ class AsyncKapsoClient(_BaseKapsoClient):
         super().__init__(*args, **kwargs)
         self._http = http_client or httpx.AsyncClient(timeout=self.timeout)
 
-    async def _post(self, path: str, payload: dict[str, Any]) -> dict[str, Any]:
-        response = await self._http.post(self._url(path), json=payload, headers=self._headers)
+    async def _post(self, path: str, payload: dict[str, Any], url: str | None = None) -> dict[str, Any]:
+        response = await self._http.post(url or self._url(path), json=payload, headers=self._headers)
         return self._handle(response)
 
-    async def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any]:
-        response = await self._http.get(self._url(path), params=_clean(params), headers=self._headers)
+    async def _get(self, path: str, params: dict[str, Any], url: str | None = None) -> dict[str, Any]:
+        response = await self._http.get(
+            url or self._url(path), params=_clean(params), headers=self._headers
+        )
         return self._handle(response)
 
     async def send_text(self, to: str, body: str) -> dict[str, Any]:
@@ -177,3 +219,28 @@ class AsyncKapsoClient(_BaseKapsoClient):
             "conversations",
             {"status": status, "phone_number": phone_number, "limit": limit, **params},
         )
+
+    async def list_users(self) -> dict[str, Any]:
+        return await self._get("", {}, url=f"{self.platform_url}/users")
+
+    async def list_assignments(self, conversation_id: str) -> dict[str, Any]:
+        return await self._get("", {}, url=self._assignments_url(conversation_id))
+
+    async def get_active_assignment(self, conversation_id: str) -> dict[str, Any] | None:
+        return self._active(await self.list_assignments(conversation_id))
+
+    async def assign_conversation(
+        self, conversation_id: str, user_id: str, notes: str | None = None
+    ) -> dict[str, Any]:
+        assignment = _clean({"user_id": user_id, "notes": notes})
+        return await self._post(
+            "", {"assignment": assignment}, url=self._assignments_url(conversation_id)
+        )
+
+    async def unassign_conversation(self, conversation_id: str) -> dict[str, Any] | None:
+        active = await self.get_active_assignment(conversation_id)
+        if active is None:
+            return None
+        url = f"{self._assignments_url(conversation_id)}/{active['id']}"
+        response = await self._http.patch(url, json={"assignment": {"active": False}}, headers=self._headers)
+        return self._handle(response)

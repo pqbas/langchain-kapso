@@ -4,6 +4,7 @@ from langchain_kapso.bridge import InvalidSignatureError, KapsoBridge, last_ai_t
 from langchain_kapso.client import AsyncKapsoClient, KapsoClient, KapsoError
 from langchain_kapso.tools import (
     KapsoGetMessagesTool,
+    KapsoHumanHandoffTool,
     KapsoListConversationsTool,
     KapsoSendButtonsTool,
     KapsoSendTextTool,
@@ -19,6 +20,7 @@ __all__ = [
     "KapsoClient",
     "KapsoError",
     "KapsoGetMessagesTool",
+    "KapsoHumanHandoffTool",
     "KapsoListConversationsTool",
     "KapsoSendButtonsTool",
     "KapsoSendTextTool",

@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+import os
 from typing import Any
 
+from langchain_core.runnables import RunnableConfig
 from langchain_core.tools import BaseTool, BaseToolkit
 from langchain_core.tools.base import ArgsSchema
 from pydantic import BaseModel, ConfigDict, Field
@@ -151,6 +153,53 @@ class KapsoListConversationsTool(_KapsoTool):
         return format_conversations(response)
 
 
+class HumanHandoffInput(BaseModel):
+    summary: str = Field(
+        description="Short summary for the human agent: what the customer needs and what was already checked"
+    )
+
+
+class KapsoHumanHandoffTool(_KapsoTool):
+    """Hand the current conversation to a person on the team.
+
+    Assigns the Kapso conversation to ``handoff_user_id`` with the summary as a
+    note, so it shows up in the Kapso inbox. While the conversation is assigned,
+    :class:`~langchain_kapso.KapsoBridge` stops running the agent for it; when the
+    person unassigns it, the agent takes over again with the same memory.
+
+    The conversation id comes from ``config["configurable"]["kapso_conversation_id"]``,
+    which the bridge sets on every run.
+    """
+
+    name: str = "kapso_human_handoff"
+    description: str = (
+        "Hand the conversation over to a human agent. Use it when the customer asks "
+        "for a person, or when you cannot solve the case with your other tools. "
+        "After calling it, tell the customer that a person will continue the chat."
+    )
+    args_schema: ArgsSchema | None = HumanHandoffInput
+    handoff_user_id: str | None = None
+
+    def _target(self, config: RunnableConfig) -> tuple[str, str]:
+        conversation_id = (config.get("configurable") or {}).get("kapso_conversation_id")
+        user_id = self.handoff_user_id or os.environ.get("KAPSO_HANDOFF_USER_ID")
+        if not conversation_id:
+            raise ValueError("No kapso_conversation_id in the config; run the graph through KapsoBridge.")
+        if not user_id:
+            raise ValueError("Missing handoff user. Pass handoff_user_id or set KAPSO_HANDOFF_USER_ID.")
+        return conversation_id, user_id
+
+    def _run(self, summary: str, config: RunnableConfig, **kwargs: Any) -> str:
+        conversation_id, user_id = self._target(config)
+        self.client.assign_conversation(conversation_id, user_id, notes=summary)
+        return "Conversation handed off to a human agent. Tell the customer a person will continue shortly."
+
+    async def _arun(self, summary: str, config: RunnableConfig, **kwargs: Any) -> str:
+        conversation_id, user_id = self._target(config)
+        await self._call_async("assign_conversation", conversation_id, user_id, notes=summary)
+        return "Conversation handed off to a human agent. Tell the customer a person will continue shortly."
+
+
 class KapsoToolkit(BaseToolkit):
     """All Kapso tools, ready to pass to ``model.bind_tools`` or a ``ToolNode``.
 
@@ -164,12 +213,17 @@ class KapsoToolkit(BaseToolkit):
 
     client: KapsoClient
     async_client: AsyncKapsoClient | None = None
+    handoff_user_id: str | None = None
+    """Team member who receives handed-off conversations. Adds ``kapso_human_handoff`` when set."""
 
     def get_tools(self) -> list[BaseTool]:
         kwargs = {"client": self.client, "async_client": self.async_client}
-        return [
+        tools: list[BaseTool] = [
             KapsoSendTextTool(**kwargs),
             KapsoSendButtonsTool(**kwargs),
             KapsoGetMessagesTool(**kwargs),
             KapsoListConversationsTool(**kwargs),
         ]
+        if self.handoff_user_id:
+            tools.append(KapsoHumanHandoffTool(**kwargs, handoff_user_id=self.handoff_user_id))
+        return tools
