@@ -20,6 +20,7 @@ This package packs that glue, so you write the agent and it handles the WhatsApp
 
 - Connects any LangGraph graph to a Kapso WhatsApp number with a few lines of code.
 - Uses each Kapso conversation as a LangGraph thread, so every customer keeps their own memory.
+- Works with any LangGraph checkpointer, such as PostgreSQL, so every chat's memory survives restarts.
 - Verifies webhook signatures, skips retried deliveries and processes the messages of each chat in order.
 - Answers Kapso right away and runs the agent in the background, so slow replies do not trigger retries.
 - Hands a chat to a person in the Kapso inbox and resumes the agent when they unassign it.
