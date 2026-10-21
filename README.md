@@ -8,15 +8,23 @@
 > [!WARNING]
 > Community integration, not affiliated with Kapso or LangChain.
 
+## Why
+
+Connecting a LangGraph agent to WhatsApp always takes the same glue code. Receive Kapso
+webhooks, check their signature, skip retries, keep a memory per chat, answer in order and
+stay quiet when a person takes over. Every team ends up writing it by hand.
+
+This package packs that glue, so you write the agent and it handles the WhatsApp side.
+
 ## Features
 
-- Every customer message on WhatsApp runs your LangGraph graph, and the reply goes back to the customer.
-- Each Kapso conversation is a LangGraph thread, so every customer keeps their own memory.
-- Signed webhooks are verified, retried deliveries are skipped and messages of the same chat are processed in order.
-- Kapso gets a `200` right away while the agent runs in the background.
-- The agent can hand a chat to a person in the Kapso inbox, stays quiet while they handle it and takes over again when they unassign it.
-- A small set of WhatsApp tools that is safe to give an agent reading untrusted customer messages.
-- Sync and async client for the Kapso WhatsApp and Platform APIs.
+- Connects any LangGraph graph to a Kapso WhatsApp number with a few lines of code.
+- Uses each Kapso conversation as a LangGraph thread, so every customer keeps their own memory.
+- Verifies webhook signatures, skips retried deliveries and processes the messages of each chat in order.
+- Answers Kapso right away and runs the agent in the background, so slow replies do not trigger retries.
+- Hands a chat to a person in the Kapso inbox and resumes the agent when they unassign it.
+- Includes WhatsApp tools for LangChain agents to send messages, read conversations and hand off.
+- Provides a sync and async client for the Kapso WhatsApp and Platform APIs.
 
 ## Install
 
