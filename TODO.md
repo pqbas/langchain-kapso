@@ -21,6 +21,10 @@ Ideas for the next versions, roughly in priority order.
 - [ ] Optional fallback: send an approved template to reopen the conversation.
 - [ ] Template support in the client and as a tool (`kapso_send_template`).
 
+## Graph input
+
+- [ ] `input_builder` option in `KapsoBridge`, to build any graph input from the WhatsApp message, for graphs whose state has no `messages` key.
+
 ## Session data in the graph
 
 - [ ] Optional state preset (`KapsoMessagesState`) with phone number, contact name, conversation id and new-conversation flag, filled by the bridge, besides the current `config["configurable"]` values.

@@ -20,6 +20,26 @@ as a web server that Kapso calls for every customer message.
    customer's history. Messages of the same chat run one at a time, in order.
 8. The last AI message of the result is sent to the customer.
 
+## What your graph needs
+
+The agent can be anything you build with LangGraph, from a single node to tools, RAG or
+several agents with a supervisor, including agents made with LangChain's `create_agent`.
+The bridge only needs three things from it.
+
+| Requirement | Why | If your graph is different |
+| --- | --- | --- |
+| The state has a `messages` key, like `MessagesState` | The customer's message arrives as `{"messages": [HumanMessage(text)]}` | Not configurable yet; a custom input builder is on the [TODO](../TODO.md) |
+| The answer ends up as the last `AIMessage` in `messages` | That message is what the customer receives | Pass a `reply_extractor` that returns the text to send |
+| Compiled with a checkpointer (recommended) | Gives each chat its memory between messages | Without one the agent works, but every message starts from scratch |
+
+```python
+# Answer stored somewhere else in the state
+bridge = KapsoBridge(graph, AsyncKapsoClient(), reply_extractor=lambda state: state["final_answer"])
+```
+
+If `reply_extractor` returns nothing, no message is sent, which lets a graph decide to stay
+quiet.
+
 ## Who the agent is talking to
 
 Every run gets these values in `config["configurable"]`, so nodes and tools can use them:

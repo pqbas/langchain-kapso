@@ -85,7 +85,8 @@ app = create_app(bridge)  # receives messages on POST /webhooks/whatsapp
 ```
 
 You never call `graph.invoke` yourself. When a customer writes on WhatsApp, the bridge
-runs the graph with that message and sends the answer back.
+runs the graph with that message and sends the answer back. Any LangGraph graph works as
+long as its state has a `messages` key; see [what your graph needs](docs/bridge.md#what-your-graph-needs).
 
 ### Connect it to Kapso
 
