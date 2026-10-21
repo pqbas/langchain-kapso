@@ -9,7 +9,7 @@
 > Community integration, not affiliated with Kapso or LangChain.
 
 <p align="center">
-  <img src="docs/architecture.png" alt="A customer writes on WhatsApp, Kapso sends the message to the langchain-kapso bridge on your server, the bridge runs your LangGraph agent and sends the reply back; the agent can hand the chat to a person in the Kapso inbox" width="100%"/>
+  <img src="docs/architecture.png?v=2" alt="A customer writes on WhatsApp, Kapso sends the message to the langchain-kapso bridge on your server, the bridge runs your LangGraph agent and sends the reply back; the agent can hand the chat to a person in the Kapso inbox" width="100%"/>
 </p>
 
 ## Why
