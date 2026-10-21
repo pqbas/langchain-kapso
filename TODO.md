@@ -1,0 +1,48 @@
+# TODO
+
+Ideas for the next versions, roughly in priority order.
+
+## Human handoff
+
+- [ ] `kapso_human_handoff` tool: the agent calls it when a case needs a person, with a short summary for the operator.
+- [ ] The bridge stops answering a conversation while it is in handoff, so the AI never replies on top of a human in the Kapso inbox.
+- [ ] A way to give the conversation back to the agent (tool, API call or conversation status), resuming the same LangGraph thread.
+- Note: Kapso's native handoff only applies to Kapso workflows, so external agents need this on the bridge side. Options to store the flag: conversation metadata, assignment (`assigned_user_id`) or the LangGraph state.
+
+## Bursts of messages
+
+- [ ] Merge the messages of a buffered batch (and messages that arrive while the agent is answering) into a single turn, instead of one agent run per message.
+- [ ] Document how to combine it with Kapso's webhook buffering (`buffer_enabled`, `buffer_window_seconds`).
+
+## 24-hour customer service window
+
+- [ ] Detect the "outside the 24-hour window" error and raise a clear `WindowClosedError`.
+- [ ] Optional fallback: send an approved template to reopen the conversation.
+- [ ] Template support in the client and as a tool (`kapso_send_template`).
+
+## Session data in the graph
+
+- [ ] Optional state preset (`KapsoMessagesState`) with phone number, contact name, conversation id and new-conversation flag, filled by the bridge, besides the current `config["configurable"]` values.
+
+## Multimodal messages
+
+- [ ] Audio: use Kapso's transcript (`message.kapso.transcript`) as the message text, marked as a voice note.
+- [ ] Images: download the media through Kapso and pass it to the model as an image content block, with the caption as text.
+- [ ] Documents and locations: readable text representation for the agent.
+- [ ] `kapso_get_messages` returns media in the same LLM-friendly format.
+
+## Prompt management (LLMOps hook)
+
+- [ ] Let the bridge load the system prompt from a registry (LangSmith Prompt Hub, Langfuse) with a short cache, so editing the prompt in one place updates every deployed agent without a redeploy.
+- [ ] Tag each run with the prompt version for tracing and evals.
+
+## Streaming in chunks
+
+- [ ] Optional mode that streams tokens from the graph and sends a WhatsApp message per paragraph, to cut perceived latency. Paragraphs rather than sentences, so it does not feel like spam.
+
+## Reliability and packaging
+
+- [ ] Log every reply sent, and failures with the conversation id.
+- [ ] Pluggable store for processed webhook keys (Redis, Postgres), so retries are not processed twice across restarts or workers.
+- [ ] Send to business-scoped user ids (`recipient`) when there is no phone number.
+- [ ] Publish to PyPI and add CI (tests and type checks on each push).

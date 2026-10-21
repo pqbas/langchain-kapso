@@ -91,5 +91,6 @@ uv run pytest
 
 ## Status
 
-Early version. Next steps: templates and media messages, sending to business-scoped
-user ids, and a persistent store for processed webhook keys.
+Early version, tested end to end with the Kapso sandbox. See [TODO.md](TODO.md) for
+what comes next: human handoff, merging bursts of messages, the 24-hour window,
+multimodal messages and prompt management.
