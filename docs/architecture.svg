@@ -25,8 +25,8 @@
 <text x="1215" y="410.0" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#59636e" text-anchor="middle" font-weight="normal">one of the agent's tools</text>
 <line x1="188" y1="235" x2="296" y2="155" stroke="#1f2328" stroke-width="1.6" marker-end="url(#a)"/>
 <text x="225" y="180.0" font-family="Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e" text-anchor="middle" font-weight="normal">message</text>
-<line x1="300" y1="200" x2="192" y2="262" stroke="#1f2328" stroke-width="1.6" marker-end="url(#a)"/>
-<text x="262" y="248.0" font-family="Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e" text-anchor="middle" font-weight="normal">reply</text>
+<line x1="300" y1="200" x2="192" y2="280" stroke="#1f2328" stroke-width="1.6" marker-end="url(#a)"/>
+<text x="262" y="262.0" font-family="Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e" text-anchor="middle" font-weight="normal">reply</text>
 <line x1="570" y1="150" x2="701" y2="150" stroke="#1f2328" stroke-width="1.6" marker-end="url(#a)"/>
 <text x="635.5" y="142.0" font-family="Helvetica, Arial, sans-serif" font-size="12.5" fill="#59636e" text-anchor="middle" font-weight="normal">webhook</text>
 <line x1="705" y1="195" x2="574" y2="195" stroke="#1f2328" stroke-width="1.6" marker-end="url(#a)"/>

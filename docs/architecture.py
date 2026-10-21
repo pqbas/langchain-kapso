@@ -86,7 +86,7 @@ text(1215, 410, "one of the agent's tools", 13, MUTED)
 
 # Flow
 arrow(188, 235, 296, 155, "message", lx=225, ly=180)
-arrow(300, 200, 192, 262, "reply", lx=262, ly=248)
+arrow(300, 200, 192, 280, "reply", lx=262, ly=262)
 arrow(570, 150, 701, 150, "webhook")
 arrow(705, 195, 574, 195, "reply", ly=213)
 arrow(1005, 165, 1071, 165, "runs", ly=155)
